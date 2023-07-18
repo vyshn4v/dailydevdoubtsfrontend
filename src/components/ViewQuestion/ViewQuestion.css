@@ -1,0 +1,15 @@
+.content {
+    max-width: 100%;
+}
+
+.content>pre {
+    /* width: "100%"; */
+    overflow-x: scroll;
+    background-color: #c6c6c6;
+    padding: 10px;
+    border-radius: 5px;
+    color: black;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-x: auto;
+}
