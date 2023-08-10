@@ -1,5 +1,4 @@
 import { Alert, Card, CardContent, Grid, Typography } from '@mui/material'
-import React from 'react'
 import UseColors from '../../../assets/Colors'
 import TokenIcon from '@mui/icons-material/Token';
 import { useSelector } from 'react-redux';
@@ -33,7 +32,7 @@ function Badge() {
             </Grid>
           )) :
           <Grid>
-            <Alert severity="info">Badges will be initialized within 24 hours please wait</Alert>
+            <Alert severity="info">Badges will be initialized in 12 AM please wait</Alert>
           </Grid>
         }
       </Grid>

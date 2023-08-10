@@ -19,10 +19,10 @@ function Users() {
   const [search, setSearch] = useState()
   const [filter, setFilter] = useState()
   const handleApprove = (id) => {
-    dispatch(approveUsers({ id, isBanned: false, token,role:'admin' }))
+    dispatch(approveUsers({ id, isBanned: false, token, role: 'admin' }))
   }
   const handleReject = (id) => {
-    dispatch(rejectUsers({ id, isBanned: true, token,role:'admin' }))
+    dispatch(rejectUsers({ id, isBanned: true, token, role: 'admin' }))
   }
 
 
@@ -54,17 +54,16 @@ function Users() {
   const handleFilter = (e) => {
     setFilter(e.target.value)
   }
+  const handlePagination = (e) => {
+    if (e === 'up' && users.length) {
+      dispatch(paginaTion({ start: page + 5, sort: filter, token, role: "admin" }))
+    } else if (e === 'down' && page>1) {
+      dispatch(paginaTion({ start: page - 5, sort: filter, token, role: "admin" }))
+    }
+  }
   const handleFilterClose = (e) => {
     if (e.target.name === 'Ok') {
       dispatch(getAllusers({ start: 0, sort: filter, token, role: "admin" }))
-    }
-  }
-  const handlePagination = (action) => {
-    if (action === 'up' && users.length) {
-      dispatch(paginaTion({ start: page + 5, token, role: "admin" }))
-    }
-    if (action === 'down' && page > 0) {
-      dispatch(paginaTion({ start: page - 5, token, role: "admin" }))
     }
   }
   const handleSearchSubmit = () => {
@@ -87,7 +86,7 @@ function Users() {
               <Filter handleChange={handleFilter} handleCloseProps={handleFilterClose} menu={filterProps} />
             </Stack>
             <Stack direction={'row'} >
-              <InputBar onChange={handleSearch} button={<Button onClick={handleSearchSubmit} variant='text' disableRipple sx={{ bgcolor: "transparent", backgroundColor: 'transparent' }}>Search</Button>} name={'question_id'} type={"text"} placeholder={'Enter the question id'} />
+              <InputBar onChange={handleSearch} button={<Button onClick={handleSearchSubmit} variant='text' disableRipple sx={{ bgcolor: "transparent", backgroundColor: 'transparent' }}>Search</Button>} name={'question_id'} type={"text"} placeholder={'Enter the name'} />
             </Stack>
           </Stack>
         </Stack>

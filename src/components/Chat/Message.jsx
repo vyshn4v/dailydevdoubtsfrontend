@@ -1,5 +1,4 @@
-import React from 'react';
-import ChatMsg from '@mui-treasury/components/chatMsg/ChatMsg';
+/* eslint-disable react/prop-types */
 import { Avatar, Box, Paper, Tooltip, Typography } from '@mui/material';
 
 const DefaultChatMsg = ({ message, side }) => {

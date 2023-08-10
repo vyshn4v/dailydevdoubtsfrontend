@@ -42,3 +42,23 @@ export function loginWithEmailAndPassword({ email, password }) {
         }
     })
 }
+export function generateOtp({ phone }) {
+    return server.get("auth/otp", {
+        params: {
+            phoneNumber:phone
+        }
+    })
+}
+export function changePassword({ password,otp,phone
+ }) {
+    return server.put("auth/change-password",null, {
+        params: {
+            password,otp,phoneNumber:phone
+        }
+    })
+}
+
+export default {
+    generateOtp,
+    changePassword
+}

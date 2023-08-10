@@ -49,11 +49,9 @@ function AskQuestion() {
         addQuestion({ user_id, title, html, tags,role:'user' }, token).then((response) => {
             if (response.data.status) {
                 toast.success("Question successfully added")
-                navigate('/question/' + response.data.data._id)
+                navigate('/')
             }
-            console.log(response);
         }).catch((err) => {
-            console.log(err);
             if (err.response.data.message) {
                 toast.error(err.response.data.message)
             } else {

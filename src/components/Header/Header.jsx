@@ -1,18 +1,50 @@
 import useColors from "../../assets/Colors"
-import ComputerOutlinedIcon from '@mui/icons-material/ComputerOutlined';
-import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import { useDispatch, useSelector } from "react-redux";
 import { clearUserData } from "../../redux/feature/User/userAuth/Auth";
 import { useNavigate } from "react-router-dom";
 import DrawerComponent from "../userDrawer/Drawer";
-import { AppBar, Avatar, Box, Button, Card, CardHeader, Menu, MenuItem, Stack, Toolbar, Typography } from "@mui/material"
+import { Alert, AppBar, Avatar,  Box, Button, Card, CardHeader, Menu, MenuItem, Snackbar, Stack, Toolbar } from "@mui/material"
 import Fade from '@mui/material/Fade';
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
+import logo from './images/logo-no-background.png'
 function Header() {
     const { fontColor, headerColor, cardBg } = useColors()
     const dispatch = useDispatch()
+    const [notification, setNotification] = useState(false)
+    const [notificationMessage, setNotificationMessage] = useState('')
     const navigate = useNavigate()
     const user = useSelector((state) => state.user.user)
+    const socket = useRef()
+    const { _id } = useSelector(state => state.user.user)
+    const handleNotificationClose = () => {
+        setNotification(false)
+        setNotificationMessage('')
+    }
+    useEffect(() => {
+        socket.current = io(import.meta.env.VITE_BASE_URL.replace("/api", ""))
+        return () => {
+            socket.current.disconnect();
+        };
+    }, [socket])
+    useEffect(() => {
+        socket.current.emit('room', { room_id: _id })
+        console.log('success');
+      
+        return () => {
+            socket.current.emit('leaveRoom', {
+                room_id: _id
+            })
+        }
+    }, [_id, dispatch])
+    useEffect(() => {
+        socket.current.on('notification', (data) => {
+            setNotification(true)
+            setNotificationMessage(data?.message)
+            console.log("notification", data);
+        })
+
+    }, [])
     function handleLogout() {
         setAnchorEl(null);
         localStorage.removeItem('user')
@@ -35,6 +67,7 @@ function Header() {
         { name: "Home", path: "/" },
         { name: "Bookmarks", path: "/bookmarks" },
         { name: "Users", path: "/users" },
+        { name: "Plans", path: "/plans" },
         { name: "Chat", path: "/chat" },
         { name: "Ask question", path: "/ask-question" },
     ]
@@ -54,17 +87,16 @@ function Header() {
                         <DrawerComponent drawerMenu={drawerProps} />
                     </Box>
 
-                    <Box width={"30.33%"}>
-                        <Typography component={'span'} sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            color: fontColor
-                        }}>
-                            Dailydevdoubts<ComputerOutlinedIcon />
-                        </Typography>
+                    <Box width={"30.33%"} display={'flex'} justifyContent={'center'}>
+                        <img width={150} src={logo} alt="logo"/>
                     </Box>
-                    <Box width={"30.33%"}>
+                    <Box width={"30.33%"} direction={'row'}>
                         <Stack direction={'row'} alignItems={'center'} justifyContent={'end'}>
+                            <Snackbar open={notification} autoHideDuration={6000} onClose={handleNotificationClose}>
+                                <Alert onClose={handleNotificationClose} severity="info" sx={{ width: '100%' }}>
+                                   {notificationMessage}
+                                </Alert>
+                            </Snackbar>
                             <Button onClick={handleClick} sx={{ cursor: "pointer", color: fontColor }} disableRipple>
                                 <Card sx={{ bgcolor: cardBg, color: fontColor, maxHeight: '60px', display: 'flex' }}>
                                     <CardHeader

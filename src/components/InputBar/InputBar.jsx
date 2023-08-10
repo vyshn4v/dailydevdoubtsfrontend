@@ -34,8 +34,8 @@ function InputBar({ placeholder, type, readOnly, onChange, name, padding, id, si
     }
     return (
         <TextField id={id} size={size || "small"} type={visible ? "text" : type}
-            InputProps={type === "password" ? { readOnly: readOnly, endAdornment: <InputAdornment >{visible ? <VisibilityOutlinedIcon onClick={handleVisibility} sx={{ color: fontColor, cursor: "pointer" }} /> : <VisibilityOffOutlinedIcon sx={{ color: fontColor, cursor: "pointer" }} onClick={handleVisibility} />}</InputAdornment> } : { readOnly: readOnly, endAdornment: button && < InputAdornment > {button ?? ""}</ InputAdornment> }}
-            inputProps={{ style: { textTransform: "initial" } }}
+            InputProps={type === "password" ? { readOnly: readOnly,maxLength: 10, endAdornment: <InputAdornment >{visible ? <VisibilityOutlinedIcon onClick={handleVisibility} sx={{ color: fontColor, cursor: "pointer" }} /> : <VisibilityOffOutlinedIcon sx={{ color: fontColor, cursor: "pointer" }} onClick={handleVisibility} />}</InputAdornment> } : { readOnly: readOnly,maxLength: 10,    endAdornment: button && < InputAdornment > {button ?? ""}</ InputAdornment> }}
+            inputProps={{ style: { textTransform: "initial" }}}
             InputLabelProps={{
                 style: { color: fontColor }
             }}

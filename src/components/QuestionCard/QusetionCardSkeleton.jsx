@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { Avatar, Skeleton, Stack } from "@mui/material";
+import { Avatar, Stack } from "@mui/material";
 
 export default function QuestionCardSkeleton() {
     const { cardBg, fontColor } = useColors()

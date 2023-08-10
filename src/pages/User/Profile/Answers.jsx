@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import  { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import TableComponent from '../../../components/Table/Table'
 import { useNavigate } from 'react-router-dom'
@@ -8,18 +8,18 @@ function Answers() {
     const answers = useSelector(state => state.profile.profile.answers)
     const [data, setData] = useState([])
     const navigate = useNavigate()
-    const handleNavigate = ({ _id }) => {
+    const handleNavigate = useCallback((_id) => {
         navigate('/question/' + _id)
-    }
+    },[navigate])
     useEffect(() => {
         setData(answers?.map((answer) => {
             return {
-                Body: answer.body?.substr(0, 40) + "...",
+                Body: <div dangerouslySetInnerHTML={{__html:answer.body?.substr(0, 100) + "..."}}></div>,
                 Asked: new Date(answer.createdAt).toLocaleDateString(),
-                Answer: <Button color='primary' onClick={() => handleNavigate({ _id: answer.question })}>view</Button>,
+                Answer: <Button color='primary' onClick={() => handleNavigate(answer.question )}>view</Button>,
             }
         }))
-    }, [answers])
+    }, [answers, handleNavigate])
     return (
         <TableComponent data={data} />
     )

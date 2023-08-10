@@ -1,13 +1,13 @@
 import { Box, Button, Container, Stack, Typography } from "@mui/material"
 import UseColors from "../../../assets/Colors"
 import InputBar from "../../../components/InputBar/InputBar"
-import { Link, useNavigate } from "react-router-dom"
+import {  useNavigate } from "react-router-dom"
 import Footer from "../../../components/Footer/Footer"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { loginAdmin } from "../../../redux/feature/Admin/adminAuth/Auth"
 import { toast } from "react-toastify"
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 function AdminLogin() {
@@ -27,7 +27,6 @@ function AdminLogin() {
     });
     const {
         register,
-        control,
         handleSubmit,
         formState: { errors }
     } = useForm({

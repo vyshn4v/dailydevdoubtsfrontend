@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import TableComponent from '../../../components/Table/Table'
 import { useDispatch, useSelector } from 'react-redux'
 import { approveQuestion, getReportedQuestions, rejectQuestion } from '../../../redux/feature/Admin/reportedQuestions/ReportedQuestions'
@@ -6,7 +6,6 @@ import { Button, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Stack } from '@mui/system'
 import UseColors from '../../../assets/Colors'
-import Filter from '../../../components/FilterDropdown/Filter'
 import InputBar from '../../../components/InputBar/InputBar'
 
 function ViewReportedQuestion() {

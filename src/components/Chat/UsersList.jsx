@@ -1,10 +1,10 @@
+/* eslint-disable react/prop-types */
 import { ExpandLess, ExpandMore } from '@mui/icons-material'
-import { Collapse, IconButton, List, ListItemButton, ListItemText, Stack, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import { Collapse, List, ListItemButton, ListItemText, Stack, Typography } from '@mui/material'
+import { useState } from 'react'
 import UseColors from '../../assets/Colors'
-import RemoveIcon from '@mui/icons-material/Remove';
 function UsersList({ users, chat, _id }) {
-    const { fontColor, cardBg, bgColor } = UseColors()
+    const { fontColor, bgColor } = UseColors()
     const [openUsersList, setOpenUsersList] = useState(false)
     const handleClick = () => {
         setOpenUsersList(prev => !prev)
@@ -28,18 +28,6 @@ function UsersList({ users, chat, _id }) {
                                     <Typography fontSize={10}>
                                         {user?.user?.email}
                                     </Typography>
-                                </Stack>
-                                <Stack>
-                                    {
-                                        (chat?.users?.find(user => _id == user?.user?._id)?.role === "admin") ?
-                                            <IconButton sx={{'&:hover':{
-                                            
-                                                color:'red',
-                                            }}}>
-                                                <RemoveIcon />
-                                            </IconButton>
-                                            : ''
-                                    }
                                 </Stack>
                             </ListItemButton>
                         </List>

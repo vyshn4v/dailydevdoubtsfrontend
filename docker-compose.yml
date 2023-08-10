@@ -1,0 +1,32 @@
+# version: '1'
+# services:
+#     nginx-react:
+#         image: reactapp:latest
+#         container_name: myreactapp
+#         build:
+#           context: .
+#           dockerfile: Dockerfile
+#         ports:
+#           - 80:80
+#         environment:
+#           NODE_ENV: production  
+
+version: '3.9'
+
+services:
+  nginx-react:
+    image: reactapp:latest
+    container_name: myreactapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      NODE_ENV: production
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+    command: certonly --webroot --webroot-path /usr/share/nginx/html -d localhost

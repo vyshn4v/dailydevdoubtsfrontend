@@ -14,8 +14,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 function Login() {
     const { buttonColor, cardBg, fontColor } = useColors()
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
     const [id, setId] = useState(0)
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -32,22 +30,12 @@ function Login() {
 
     const {
         register,
-        control,
         handleSubmit,
         formState: { errors }
     } = useForm({
         resolver: yupResolver(validationSchema)
     });
 
-
-    function handleLogin(e) {
-        if (e.target.name === 'email') {
-            setEmail(e.target.value)
-        }
-        if (e.target.name === 'password') {
-            setPassword(e.target.value)
-        }
-    }
     useEffect(() => {
         if (isLoading) {
             // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,12 +56,11 @@ function Login() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, isLoading, isError, isSuccess, navigate])
     function onSubmit(data) {
-        console.log(data);
         dispatch(LoginUser(data))
     }
     let textField = [
-        { placeholder: "Enter the email", type: "text", name: "email", onchange: handleLogin, },
-        { placeholder: "Enter the password", type: "password", name: "password", onchange: handleLogin },
+        { placeholder: "Enter the email", type: "text", name: "email" },
+        { placeholder: "Enter the password", type: "password", name: "password"},
     ]
     const login = useGoogleLogin({
         onSuccess: (data) => {
@@ -92,7 +79,6 @@ function Login() {
                 alignItems: "center",
                 borderRadius: "10px"
             }} spacing={10}>
-                {/* <Header /> */}
                 <Box sx={{
                     minWidth: "350px",
                     maxWidth: "400px",
@@ -107,7 +93,12 @@ function Login() {
                 }}>
                     <Typography sx={{
                         color: fontColor,
-                        fontSize: "30px"
+                        fontSize: "20px"
+                    }}>DAILYDEVDOUBTS</Typography>
+                    <Typography sx={{
+                        marginTop:'10px',
+                        color: fontColor,
+                        fontSize: "20px"
                     }}>Login</Typography>
                     <Container>
                         {
@@ -130,8 +121,12 @@ function Login() {
                     <Button variant='contained' sx={{ marginTop: "10px", color: fontColor, bgcolor: buttonColor, "&:hover": { bgcolor: buttonColor } }} onClick={handleSubmit(onSubmit)} >Login</Button>
                     <Typography sx={{
                         color: fontColor,
-                        marginTop: "20px"
-                    }}>Don't have an account? <Link to={'/signup'} style={{ textDecoration: "none", color: fontColor }}>Signup</Link></Typography>
+                        marginTop: "10px"
+                    }}>Don&apos;t have an account? <Link to={'/signup'} style={{ textDecoration: "none", color: fontColor }}>SignUp</Link></Typography>
+                    <Typography sx={{
+                        color: fontColor,
+                        marginTop: "10px"
+                    }}><Link to={'/forgot-password'} style={{ textDecoration: "none", color: fontColor }}>Forgot password </Link></Typography>
                 </Box>
                 <Button variant='text' sx={{
                     minWidth: "100%",

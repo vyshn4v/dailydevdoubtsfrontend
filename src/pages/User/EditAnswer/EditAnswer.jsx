@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import InputBar from "../../../components/InputBar/InputBar"
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css';
-import { Button, Chip, Stack, Typography } from "@mui/material";
+import { Button,  Stack, Typography } from "@mui/material";
 import UseColors from "../../../assets/Colors";
 import { toast } from "react-toastify";
-import { addQuestion } from "../../../services/question";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { editAnswer } from "../../../services/answer";
@@ -22,7 +20,7 @@ function EditAnswer() {
         }else{
             setHtml(answer?.body??'')
         }
-    }, [answer])
+    }, [answer, navigate, question_id])
     const modules = {
         toolbar: [
             [{ 'header': [1, 2, false] }],

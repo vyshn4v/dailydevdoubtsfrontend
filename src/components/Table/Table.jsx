@@ -1,8 +1,9 @@
-import { Button, Container, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, styled, tableCellClasses } from "@mui/material"
+/* eslint-disable react/prop-types */
+import { Button, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, styled, tableCellClasses } from "@mui/material"
 import UseColors from "../../assets/Colors";
 
 
-function TableComponent({ loading, data, handleApprove, handleReject }) {
+function TableComponent({ loading, data }) {
     const { fontColor, bgColor, cardBg } = UseColors()
     const StyledTableCell = styled(TableCell)(() => ({
         [`&.${tableCellClasses.head}`]: {

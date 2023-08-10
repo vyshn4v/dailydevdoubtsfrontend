@@ -1,25 +1,22 @@
-import { Avatar, Button, Collapse, Divider, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack } from '@mui/material'
-import React, { useEffect, useRef, useState } from 'react'
+import { Avatar, Button,  Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Stack } from '@mui/material'
+import  { useEffect, useRef, useState } from 'react'
 import InputBar from '../InputBar/InputBar'
 import UseColors from '../../assets/Colors'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { addMessages, deleteChat, getAllChat, updateChat } from '../../redux/feature/User/chat/Chat'
+import { addMessages, deleteChat, getAllChat } from '../../redux/feature/User/chat/Chat'
 import { io } from 'socket.io-client'
-import chatservice from '../../services/chat'
+import chatService from '../../services/chat'
 import DefaultChatMsg from './Message'
 import { toast } from 'react-toastify'
-import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material'
-import AlertDialogModal from '../../components/DeleteModal/AlertDialogModal'
 import UsersList from './UsersList'
+import AlertDialogModal from '../../components/DeleteModal/AlertDialogModal'
 function ChatCompnent() {
     const messagesEndRef = useRef(null);
     const socket = useRef(null);
     const { chat_id } = useParams()
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const [joinMessage, setJoinMessage] = useState('')
-    const [newMessage, setNewMessage] = useState()
     const [message, setMessage] = useState('')
     const { _id, token, name } = useSelector(state => state.user.user)
     const chat = useSelector(state => state?.chats?.chats?.find((chat) => chat_id == chat._id))
@@ -37,7 +34,6 @@ function ChatCompnent() {
             room_id: chat_id
         })
         return () => {
-            console.log("exut");
             socket.current.emit('leaveRoom', {
                 user_name: name,
                 user: _id,
@@ -52,7 +48,7 @@ function ChatCompnent() {
         })
 
 
-    }, [])
+    }, [dispatch])
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -61,17 +57,17 @@ function ChatCompnent() {
         if (!chat) {
             navigate('/chat')
         }
-    }, [chat])
+    }, [chat, navigate])
 
     const handleSendMessage = () => {
-        chatservice.sendMessage({ token, message, chat_id }).then((data) => {
+        chatService.sendMessage({ token, message, chat_id }).then((data) => {
             socket.current.emit('chat', {
                 room_id: chat_id,
                 data: data.data.data
             })
             dispatch(addMessages({ room_id: chat_id, data: data.data.data }))
             setMessage("")
-        }).catch((err) => {
+        }).catch(() => {
             toast.error('Failed to send Message')
         })
     }
@@ -86,7 +82,7 @@ function ChatCompnent() {
         );
     };
     const handleDeleteChat = () => {
-        chatservice.deleteChat({ token, chat_id }).then((res) => {
+        chatService.deleteChat({ token, chat_id }).then((res) => {
             const users = res.data.data?.users?.filter((user) => user.user != _id).map((user) => user.user)
             console.log(res.data.data);
             socket.current.emit('deleteChat', {
@@ -95,12 +91,12 @@ function ChatCompnent() {
             })
             dispatch(deleteChat({ room_id: chat_id, data: res.data.data }))
             navigate('/chat')
-        }).catch((err) => {
-            console.log(res);
+        }).catch(() => {
+            toast.error('Failed to delete chat')
         })
     }
     const handleExitChat = () => {
-        chatservice.leftChat({ token, chat_id }).then((res) => {
+        chatService.leftChat({ token, chat_id }).then((res) => {
             console.log(res);
             const users = res.data?.data?.users?.filter((user) => user.users?._id != _id)?.map((user) => user.user._id)
             console.log(users);
@@ -114,7 +110,7 @@ function ChatCompnent() {
             console.log(err);
         })
     }
-    const { fontColor, cardBg, bgColor } = UseColors()
+    const { fontColor, cardBg } = UseColors()
     return (
         <>
             <List overflow={'scroll'} sx={{

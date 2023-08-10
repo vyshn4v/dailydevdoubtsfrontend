@@ -1,5 +1,4 @@
 import { Grid, List, ListItem, ListItemText } from '@mui/material'
-import React from 'react'
 
 function ChatDummy() {
     return (

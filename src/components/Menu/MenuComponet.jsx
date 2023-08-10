@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { IconButton, Menu, MenuItem } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from 'react';
@@ -8,7 +9,7 @@ function MenuComponent({ user, answer }) {
     const bool = Boolean(anchorEl2)
     const { fontColor } = UseColors()
     const navigate = useNavigate()
-    const handleAnsweMenu = (event) => {
+    const handleAnswerMenu = (event) => {
         setAnchorEl2(event.currentTarget);
     };
     const handleAnswerClose = () => {
@@ -24,7 +25,7 @@ function MenuComponent({ user, answer }) {
     };
     return (
         <IconButton aria-label="settings">
-            <MoreVertIcon sx={{ color: fontColor }} onClick={handleAnsweMenu} />
+            <MoreVertIcon sx={{ color: fontColor }} onClick={handleAnswerMenu} />
             <Menu
                 id={`basic-menu`}
                 anchorEl={anchorEl2}

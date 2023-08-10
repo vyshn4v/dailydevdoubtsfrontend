@@ -1,5 +1,6 @@
-import { Avatar, Button, Card, CardHeader, Chip, Container, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Stack, Tooltip, Typography, } from '@mui/material'
-import React, { useState } from 'react'
+/* eslint-disable react/prop-types */
+import { Avatar, Button, Card, CardHeader, Chip, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Stack, Tooltip, Typography, } from '@mui/material'
+import React from 'react'
 import useColors from '../../assets/Colors'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -11,12 +12,9 @@ import './ViewQuestion.css'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useSelector } from 'react-redux';
-import LoadingButton from '@mui/lab/LoadingButton';
-import SendIcon from '@mui/icons-material/Send';
 import { useNavigate } from 'react-router-dom';
 import MenuComponent from '../Menu/MenuComponet';
-import InputBar from '../InputBar/InputBar';
-function ViewQuestion({ data, handleUpAndDownVote, handleAnswer, handleSubmitAnswer, submitAnswer, handleUpAndDownVoteAnswer }) {
+function ViewQuestion({ data, handleUpAndDownVote, handleAnswer, handleSubmitAnswer, handleUpAndDownVoteAnswer }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const open = Boolean(anchorEl);
@@ -25,7 +23,7 @@ function ViewQuestion({ data, handleUpAndDownVote, handleAnswer, handleSubmitAns
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
-    const handleClickClose = (event) => {
+    const handleClickClose = () => {
         setAnchorEl(null);
     };
     const handleClose = () => {

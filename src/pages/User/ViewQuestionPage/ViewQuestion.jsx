@@ -1,17 +1,9 @@
-import { Container, Grid, IconButton, Menu, MenuItem, Stack, Typography, } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import useColors from '../../../assets/Colors'
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Fade from '@mui/material/Fade';
-import HTMLReactParser from 'html-react-parser';
+import { Container } from '@mui/material'
+import { useEffect, useState } from 'react'
 import ViewQuestion from '../../../components/ViewQuestion/ViewQuestion';
 import { useDispatch, useSelector } from 'react-redux';
 import { addAnswerToState, downVoteAnswer, downVoteQuestion, getQuestion, upvoteAnswer, upvoteQuestion } from '../../../redux/feature/User/singleQuestion/Singlequestion';
 import { useParams } from 'react-router-dom';
-import { upVoteQuestion } from '../../../services/question';
 import { addAnswer } from '../../../services/answer';
 import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading/Loading';
@@ -20,19 +12,11 @@ import { addToBookmarkQuestion, removeFromBookmarkQuestion } from '../../../redu
 
 function ViewQuestionPage() {
   const dispatch = useDispatch()
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
   const { question_id } = useParams()
   const { token, _id: user_id } = useSelector(state => state.user.user)
   const { question } = useSelector(state => state.question)
   const [answer, setAnswer] = useState()
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
   const handleAnswer = (html) => {
     setAnswer(html)
   };
@@ -55,7 +39,7 @@ function ViewQuestionPage() {
   const user = useSelector(state => state.user.user)
   useEffect(() => {
     dispatch(getQuestion({ question_id, token,role:'user' }))
-  }, [])
+  }, [dispatch, question_id, token])
   const handleUpAndDownVote = {
     upVote: () => {
       dispatch(upvoteQuestion({ question_id, user_id, token,role:'user' }))
@@ -80,7 +64,6 @@ function ViewQuestionPage() {
     }
 
   }
-  const { fontColor } = useColors()
   return (
     <Container sx={{
       display: "flex",

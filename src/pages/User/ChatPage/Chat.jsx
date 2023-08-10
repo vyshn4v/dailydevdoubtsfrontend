@@ -1,23 +1,21 @@
-import { Avatar, Box, Button, Container, Divider, Fab, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Stack, TextField, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { Avatar, Box, Button, Container, Divider, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material"
 import InputBar from "../../../components/InputBar/InputBar"
 import ChatLayout from "./ChatDrawer"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UseColors from "../../../assets/Colors";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addChat, createChat, deleteChat, getAllChat, updateChat } from "../../../redux/feature/User/chat/Chat";
+import { addChat, deleteChat, getAllChat, updateChat } from "../../../redux/feature/User/chat/Chat";
 import { clearUsers, getAllusers } from "../../../redux/feature/Admin/userManagment/UserManagment";
 import AddIcon from '@mui/icons-material/Add';
 import ModalDialogBox from "../../../components/Modal/ModalDialogBox";
 import { toast } from "react-toastify";
 import { io } from 'socket.io-client'
 import chatServices from '../../../services/chat'
-const socket = io(import.meta.env.VITE_BASE_URL.replace("/api", ""))
 function Chat() {
     const [chat, setChat] = useState(false)
     const [modalOpen, setModalOpen] = useState(false);
     const [groupName, setGroupName] = useState('')
-    const [groupMembers, setGroupMembers] = useState([])
     const [groupProfile, setGroupProfile] = useState()
     const [selectedUsers, setSelectedUsers] = useState([])
     const theme = useTheme();
@@ -27,6 +25,7 @@ function Chat() {
     const user = useSelector(state => state.user.user)
     const { token } = useSelector(state => state.user.user)
     const { users } = useSelector(state => state.users)
+    const socket = useRef(null)
     const { _id } = useSelector(state => state.user.user)
     const { chats } = useSelector(state => state.chats)
     const isMobileView = useMediaQuery(theme.breakpoints.down('md'));
@@ -36,21 +35,24 @@ function Chat() {
         navigate('/chat/' + chat_id)
     }
     useEffect(() => {
+        socket.current = io(import.meta.env.VITE_BASE_URL.replace("/api", ""))
+    }, [])
+    useEffect(() => {
         dispatch(getAllChat({ token, role: 'user' }))
-        socket.emit('room', { room_id: _id })
-        socket.on('chatCreated', (data) => {
+        socket.current.emit('room', { room_id: _id })
+        socket.current.on('chatCreated', (data) => {
             dispatch(addChat(data))
         })
-        socket.on('userLeft', (data) => {
+        socket.current.on('userLeft', (data) => {
             console.log('chat updated', data);
             dispatch(updateChat(data))
         })
-        socket.on('deletedChat', (data) => {
+        socket.current.on('deletedChat', (data) => {
             console.log(data);
-            dispatch(deleteChat({room_id:data.data._id,data}))
+            dispatch(deleteChat({ room_id: data.data._id, data }))
         })
         return () => {
-            socket.emit('leaveRoom', {
+            socket.current.emit('leaveRoom', {
                 room_id: _id
             })
         }
@@ -69,14 +71,13 @@ function Chat() {
     }
     const handleCreateChat = (user_id) => {
         chatServices.createChat({ token, users: [{ user: user_id }], role: 'user' }).then((data) => {
-            console.log(data.data);
             dispatch(addChat(data.data.data))
-            socket.emit('newChat', {
+            socket.current.emit('newChat', {
                 room_id: [user_id],
                 data: data.data.data
             })
         }).catch((err) => {
-            toast.error('Failed to create Chat')
+            toast.error(err.response.data.message||'Failed to create Chat')
         })
         dispatch(clearUsers())
     }
@@ -103,12 +104,14 @@ function Chat() {
 
         chatServices.createChat({ token, users, isGroup: true, name: groupName, image: groupProfile }).then((data) => {
             dispatch(addChat(data.data.data))
-            socket.emit('newChat', {
+            socket.current.emit('newChat', {
                 room_id: rooms,
                 data: data.data.data
             })
+            setGroupProfile('')
+            setGroupName('')
             setModalOpen(prev => !prev)
-        }).catch((err) => {
+        }).catch(() => {
             toast.error('Failed to create Chat')
         })
         dispatch(clearUsers())
@@ -134,6 +137,9 @@ function Chat() {
     const handleSearchUserState = (e) => {
         setSearchUser(e?.target?.value ?? "")
     }
+    const handleDelete=(id)=>{
+        setSelectedUsers(prev=>prev.filter((user)=>user._id!=id))
+    }
 
     return (
         <Container >
@@ -152,7 +158,7 @@ function Chat() {
                 <ChatLayout
                     open={chat}
                     setOpen={() => setChat(!chat)}
-                    DrawerComponet={
+                    DrawerComponent={
                         <Grid container overflow={'scroll'} maxHeight={'80vh'} minHeight={"70vh"} sx={{
                             '&::-webkit-scrollbar': {
                                 display: "none"
@@ -177,7 +183,7 @@ function Chat() {
                                                     <AddIcon sx={{ color: fontColor }} />
                                                 </IconButton>
                                             </Tooltip>
-                                            <ModalDialogBox handleClear={handleClear} groupProfile={groupProfile} handleImage={handleImage} handleSearchUserState={handleSearchUserState} selectedUsers={selectedUsers} handleCreateGroup={handleCreateGroup} handleGroupMembers={handleGroupMembers} handleGroupTitle={handleGroupTitle} handleSearchUser={handleSubmit} users={users} open={modalOpen} setOpen={setModalOpen} />
+                                            <ModalDialogBox handleDelete={handleDelete} handleClear={handleClear} groupProfile={groupProfile} handleImage={handleImage} handleSearchUserState={handleSearchUserState} selectedUsers={selectedUsers} handleCreateGroup={handleCreateGroup} handleGroupMembers={handleGroupMembers} handleGroupTitle={handleGroupTitle} handleSearchUser={handleSubmit} users={users} open={modalOpen} setOpen={setModalOpen} />
                                         </ListItemIcon>
                                     </ListItem>
                                 </List>
@@ -223,10 +229,10 @@ function Chat() {
                                         chats?.map((chat, index) => (
                                             <ListItem key={index} onClick={() => handleNavigatetochat(chat._id)} sx={{ color: fontColor, bgcolor: cardBg, marginTop: "10px", padding: "10px", cursor: 'pointer' }}>
                                                 <ListItemIcon>
-                                                    <Avatar alt="Remy Sharp" src={chat?.profile_image ?? chat?.users?.filter((data) => _id != data.user?._id)[0]?.user?.profile_image} />
+                                                    <Avatar alt="Remy Sharp" src={chat?.isGroupChat? chat.profile_image : chat?.users?.filter((data) => _id != data.user?._id)[0]?.user?.profile_image} />
                                                 </ListItemIcon>
                                                 <ListItemText primary={chat.name ?? chat?.users?.filter((data) => _id !== data.user?._id)[0]?.user?.name} ></ListItemText>
-                                                <ListItemText primary="online" align="right"></ListItemText>
+                                                {/* <ListItemText primary="online" align="right"></ListItemText> */}
                                             </ListItem>
                                         ))
                                     }

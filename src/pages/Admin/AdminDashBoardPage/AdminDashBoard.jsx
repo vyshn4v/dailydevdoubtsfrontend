@@ -10,20 +10,21 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import { faker } from '@faker-js/faker';
-import { Box, Button, Card, CardActions, CardContent, Grid, Stack, Typography } from '@mui/material';
+import {  Card,CardContent, Grid, Stack, Typography } from '@mui/material';
 import UseColors from '../../../assets/Colors';
 import dashboardServices from '../../../services/dashboard'
 import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading/Loading';
 import { useSelector } from 'react-redux';
+import { useErrorBoundary } from 'react-error-boundary';
 function AdminDashBoard() {
+  const { showBoundary } = useErrorBoundary()
   const { token } = useSelector(state => state.admin.admin)
   const [data, setData] = useState({})
   const [graphData, setGraphData] = useState()
   const { cardBg, fontColor } = UseColors()
   useEffect(() => {
-    dashboardServices.getDashBoardData({ token,role:'admin' }).then((res) => {
+    dashboardServices.getDashBoardData({ token, role: 'admin' }).then((res) => {
       console.log(res);
       setData(res.data?.data)
       const questionChart = res.data.data.questionChart
@@ -49,8 +50,9 @@ function AdminDashBoard() {
     }).catch((err) => {
       console.log(err);
       toast.error('error while loading data')
+      showBoundary("Something went wrong")
     })
-  }, [])
+  }, [showBoundary, token])
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -140,11 +142,11 @@ function AdminDashBoard() {
               </Grid>
 
             </Grid>
-            <Stack minWidth={'100%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-              <Stack minWidth={"80%"} >
+            <Grid container justifyContent="center">
+              <Grid item xs={8} minHeight={'60vh'} minWidth={'60vh'} >
                 <Bar options={options} data={graph} />
-              </Stack>
-            </Stack>
+              </Grid>
+            </Grid>
           </Stack>
       }
     </>
@@ -152,39 +154,3 @@ function AdminDashBoard() {
 }
 
 export default AdminDashBoard
-
-// console.log(chartData.orderChart[0].data)
-// const ordersKeys = Object.keys(chartData.orderChart[0].data)
-// const ordersData = ordersKeys.map((key, index) => chartData.orderChart[0].data[key])
-// const usersKeys = Object.keys(chartData.userChart[0].data)
-// const usersData = usersKeys.map((key, index) => chartData.userChart[0].data[key])
-// const restaurantKeys = Object.keys(chartData.restaurantChart[0].data)
-// const restaurantData = restaurantKeys.map((key, index) => chartData.restaurantChart[0].data[key])
-// new Chart(ctx, {
-//     type: 'bar',
-//     data: {
-//         labels: ordersKeys,
-//         datasets: [{
-//             label: 'orders',
-//             data: ordersData,
-//             borderWidth: 1
-//         }, {
-//             label: 'users',
-//             data: usersData,
-//             borderWidth: 1
-//         }, {
-//             label: 'restaurants',
-//             data: restaurantData,
-//             borderWidth: 1
-//         }]
-//     },
-//     responsive: true,
-//     options: {
-//         scales: {
-//             y: {
-//                 beginAtZero: true
-//             }
-//         }
-//     }
-// });
-// })

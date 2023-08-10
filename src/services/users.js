@@ -1,6 +1,6 @@
 import server from "../config/Axios";
 
-export function getAllUsers({ start, search,limit, sort, token, role }) {
+export function getAllUsers({ start, search, limit, sort, token, role }) {
     return server.get('user/all-users', {
         headers: {
             'X-Role': `${role}`,
@@ -12,6 +12,19 @@ export function getAllUsers({ start, search,limit, sort, token, role }) {
             sort,
             limit
         }
+    })
+}
+export function getFollowers({ start, search, limit, sort, token, role }) {
+    return server.get('user/followers', {
+        headers: {
+            'X-Role': `${role}`
+        },
+        // params: {
+        //     start,
+        //     search,
+        //     sort,
+        //     limit
+        // }
     })
 }
 export function manageUsers({ id, isBanned, token, role }) {
@@ -38,19 +51,24 @@ export function getProfile({ user, role }) {
     })
 }
 export function uploadProfile(image) {
-    return server.put('user/profile', image,{
-        headers:{
-            "X-Role":'user'
+    return server.put('user/profile', image, {
+        headers: {
+            "X-Role": 'user'
         }
     })
 }
 export function followUnfollowUser({ user, follow }) {
     return server.put('user/follow-unfollow', null, {
-        params: {
-            user_id: user,
-            follow
-        },
-        headers:{
+        params:
+            follow ?
+                {
+                    user_id: user,
+                    follow
+                } :
+                {
+                    user_id: user,
+                },
+        headers: {
             'X-Role': 'user',
         }
     })
@@ -61,5 +79,6 @@ export default {
     manageUsers,
     getProfile,
     uploadProfile,
-    followUnfollowUser
+    followUnfollowUser,
+    getFollowers
 }

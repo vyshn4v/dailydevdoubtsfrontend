@@ -1,55 +1,59 @@
-import { Avatar, Button, Card, CardActions, CardContent, CardMedia, Grid, Stack, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { Avatar, Grid, Stack, Typography } from '@mui/material'
+import  { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
-import { getAllusers, paginaTion } from '../../../redux/feature/Admin/userManagment/UserManagment'
 import InputBar from '../../../components/InputBar/InputBar'
-import Loading from '../../../components/Loading/Loading'
 import TableComponent from '../../../components/Table/Table'
+import usersServices from '../../../services/users'
 
+import { useErrorBoundary } from 'react-error-boundary'
 function Users() {
+    const { showBoundary } = useErrorBoundary()
     const dispatch = useDispatch()
     const [search, setSearch] = useState('')
-    const { users, isSuccess, isError, isLoading, page } = useSelector(state => state.users)
-    const { token, following_user } = useSelector(state => state.user.user)
+    // const { users, isSuccess, isError, isLoading, page } = useSelector(state => state.users)
+    const [users, setUsers] = useState(null)
     const [rearrangedData, setRearrangedData] = useState()
+    const handleUnfollow = (user_id) => {
+        console.log(user_id);
+        usersServices.followUnfollowUser({ user: user_id }).then((res) => {
+            console.log(res);
+            if (res.data.status) {
+                let data = users?.filter((user) => user._id != user_id).map((user) => user._id)
+                localStorage.setItem('user', JSON.stringify({ ...JSON.parse(localStorage.getItem('user')), "following_user": data }))
+                setUsers(prev => prev?.filter(user => user._id != user_id))
+            }
+        }).catch((err) => {
+            toast.error(err.response.data.message ?? "failed to unfollow user")
+        })
+    }
     useEffect(() => {
-        if (!isSuccess && !users?.length) {
-            dispatch(getAllusers({ token, sort: "asc",role:'user' }))
-        }
-        if (isError) {
-            toast.error("Something went wrong")
-        }
+        usersServices.getFollowers({ role: 'user' }).then((res) => {
+            setUsers(res.data.data)
+            console.log(res)
+        }).catch((err) => {
+            console.log('Failed to load users details', err)
+            showBoundary('error while loading followers')
+            toast.error(err.response.data.message ?? 'Failed to load users details')
+        })
+    }, [showBoundary])
+    useEffect(() => {
         if (users) {
-            const data = users.filter((user)=>!following_user.includes(user._id)).map((user) => {
+            const data = users.filter((user) => user.name.includes(search)).map((user) => {
                 return {
                     "Image": <Avatar src={user.profile_image} />,
-                    Name:user.name,
-                    Email:user.email,
-                    Reputation:user.reputation,
-                    Handle:{name:"unfollow",color:"error" }
+                    Name: user.name,
+                    Email: user.email,
+                    Reputation: user.reputation,
+                    Handle: { name: "unfollow", action: () => handleUnfollow(user._id), color: "error" }
                 }
             })
             setRearrangedData(data)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, isError, users])
-
+    }, [dispatch, users, search])
     const handleSearch = (e) => {
         setSearch(e.target.value)
-    }
-    const handleSearchSubmit = () => {
-        dispatch(getAllusers({ start: 0, search, token, role: "user" }))
-    }
-    const paginate = (action) => {
-        if (action === 'up' && users.length) {
-            dispatch(paginaTion({ start: page + 5, token }))
-        }
-        if (action === 'down' && page > 0) {
-            dispatch(paginaTion({ start: page - 5, token }))
-        }
-
-
     }
     return (
         <>
@@ -63,7 +67,7 @@ function Users() {
                         }}>Users</Typography>
                         <Stack direction={'row'} >
                             <Stack direction={'row'} >
-                                <InputBar onChange={handleSearch} button={<Button onClick={handleSearchSubmit} variant='text' disableRipple sx={{ bgcolor: "transparent", backgroundColor: 'transparent' }}>Search</Button>} name={'question_id'} type={"text"} placeholder={'Enter the users name'} />
+                                <InputBar onChange={handleSearch} name={'question_id'} type={"text"} placeholder={'Enter the users name'} />
                             </Stack>
                         </Stack>
                     </Stack>
@@ -71,14 +75,6 @@ function Users() {
                 <Grid item xs={12}>
                     <Grid container xs={12} justifyContent={'center'} alignItems={'center'}>
                         <TableComponent data={rearrangedData ?? []} />
-                    </Grid>
-                    <Grid display={'flex'} gap={3} marginTop={3} justifyContent={'center'} alignItems={'center'}>
-                        <Button variant='contained' onClick={() => paginate('down')}>
-                            Prev
-                        </Button>
-                        <Button variant='contained' onClick={() => paginate('up')}>
-                            Next
-                        </Button>
                     </Grid>
                 </Grid>
             </Grid>

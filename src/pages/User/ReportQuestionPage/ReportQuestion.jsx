@@ -1,5 +1,5 @@
-import { Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Stack, Switch, TextField, Typography, makeStyles } from '@mui/material'
-import React, { useState } from 'react'
+import { Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Stack, Switch, TextField, Typography } from '@mui/material'
+import  { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import UseColors from '../../../assets/Colors';
 import { reportQuestion } from '../../../services/question';
@@ -23,7 +23,7 @@ function ReportQuestion() {
   };
   const handleReportSubmit = () => {
     const id = toast.loading('please wait')
-    reportQuestion({ question_id, reason,role:'user' }).then((res) => {
+    reportQuestion({ question_id, reason,role:'user' }).then(() => {
       toast.update(id, { render: "Report send successfully", type: "success", isLoading: false, autoClose: 2000 })
     }).catch((err) => {
       console.log(err);
@@ -88,7 +88,7 @@ function ReportQuestion() {
             ))}
           </Select>
         </FormControl>
-        <Typography>Can't find the exact reson  <Switch onChange={() => setTextFieldStatus(!textFieldStatus)} /></Typography>
+        <Typography>Can&apos;t find the exact reson  <Switch onChange={() => setTextFieldStatus(!textFieldStatus)} /></Typography>
         {
           textFieldStatus &&
           <TextField

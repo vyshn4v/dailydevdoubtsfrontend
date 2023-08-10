@@ -1,8 +1,7 @@
 import { useDispatch, useSelector } from "react-redux"
-import QuestionCard from "../../../components/QuestionCard/QuestionCard"
 import TableComponent from '../../../components/Table/Table'
-import { Grid, Button } from "@mui/material"
-import { useEffect, useState } from "react"
+import {  Button } from "@mui/material"
+import { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { approveAnswerRequest } from "../../../services/answer"
 import { toast } from "react-toastify"
@@ -13,18 +12,18 @@ function Editrequests() {
   const profile = useSelector(state => state.profile.profile)
   const [data, setData] = useState()
   const handleReject = () => { }
-  const handleApprove = (answer_id) => {
-    approveAnswerRequest({ answer_id }).then((res) => {
+  const handleApprove = useCallback((answer_id) => {
+    approveAnswerRequest({ answer_id,role:"user" }).then((res) => {
       dispatch(updateEditRequest(res.data.data._id))
       console.log(res);
     }).catch((err) => {
       console.log(err);
       toast.error(err.response.data.message ?? 'failed to accept request')
     })
-  }
-  const handleNavigate = (data) => {
+  },[dispatch])
+  const handleNavigate = useCallback((data) => {
     navigate("/" + data.name + "/details", { state: { _id: data._id } })
-  }
+  },[navigate])
   useEffect(() => {
     setData(profile?.editAnswerRequests?.map((answer) => {
       return {
@@ -34,7 +33,7 @@ function Editrequests() {
         Handle: answer?.isApprove ? { name: "Reject", color: "error", action: () => handleReject(answer._id) } : { name: "Approve", color: "success", action: () => handleApprove(answer._id) }
       }
     }))
-  }, [profile])
+  }, [handleApprove, handleNavigate, profile])
   return (
     <>
       <TableComponent data={data} />

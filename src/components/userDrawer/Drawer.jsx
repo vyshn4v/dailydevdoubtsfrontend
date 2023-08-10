@@ -12,7 +12,7 @@ import Footer from "../Footer/Footer";
 // eslint-disable-next-line react/prop-types
 function DrawerComponent({ drawerMenu }) {
     const { bgColor, drawerBg, fontColor, buttonColor } = useColors()
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+    const [isDrawerOpen, setIsDrawerOpen] = useState(true)
     const dark = useSelector(state => state.user.isDarkMode)
     const dispatch = useDispatch()
     const handleDarkMode = () => {

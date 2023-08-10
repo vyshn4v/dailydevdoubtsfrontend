@@ -9,7 +9,7 @@ import { SignupUser, SignupWithGoogle } from '../../../redux/feature/User/userAu
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 function Signup() {
@@ -19,7 +19,6 @@ function Signup() {
     const [id, setId] = useState(0)
     const { user, isLoading, isError, isSuccess, errorMessage } = useSelector((state) => state.user)
     const validationSchema = Yup.object().shape({
-
         name: Yup.string()
             .required('Username is required')
             .min(6, 'Username must be at least 6 characters'),
@@ -29,24 +28,22 @@ function Signup() {
         phone: Yup.string().required('Phone is required').length(10, '10 digit required'),
         password: Yup.string()
             .required('Password is required')
-            .min(6, 'Password must be at least 6 characters')
+            .min(16, 'Password must be at least 16 characters')
             .max(40, 'Password must not exceed 40 characters'),
-        confirmPassword: Yup.string()
-            .required('Confirm Password is required')
-            .oneOf([Yup.ref('password'), null], 'Confirm Password does not match'),
     });
     const {
         register,
-        control,
         handleSubmit,
         formState: { errors }
     } = useForm({
         resolver: yupResolver(validationSchema)
     });
-
+    useEffect(() => {
+        console.log(errors);
+    }), [errors]
     function onSubmit(data) {
         console.log(data);
-        dispatch(SignupUser(data))
+        dispatch(SignupUser({ ...data, confirmPassword: data.password }))
     }
 
 
@@ -78,7 +75,6 @@ function Signup() {
         { placeholder: "Enter the email", type: "text", name: "email" },
         { placeholder: "Enter the phone number", type: "number", name: "phone" },
         { placeholder: "Enter the password", type: "password", name: "password" },
-        { placeholder: "Confirm password", type: "password", name: "confirmPassword" }
     ]
 
     const login = useGoogleLogin({
@@ -86,7 +82,7 @@ function Signup() {
             dispatch(SignupWithGoogle(data.access_token))
         },
         onError: () => {
-            console.log('Login Failed');
+            toast.error('Login Failed');
         },
     })
 
@@ -112,7 +108,12 @@ function Signup() {
                 }}>
                     <Typography sx={{
                         color: fontColor,
-                        fontSize: "30px"
+                        fontSize: "20px"
+                    }}>DAILYDEVDOUBTS</Typography>
+                    <Typography sx={{
+                        marginTop: "10px",
+                        color: fontColor,
+                        fontSize: "20px"
                     }}>Signup</Typography>
                     <Container>
                         {

@@ -9,6 +9,7 @@ export const getProfile = createAsyncThunk('profile/getProfileDetails', async (u
             throw err
         }
         return rejectWithValue(err.response.data)
+        
     }
 })
 

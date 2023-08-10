@@ -1,14 +1,18 @@
+/* eslint-disable react/prop-types */
 import useColors from "../../assets/Colors"
 import Typography from '@mui/material/Typography';
 import { Avatar, Grid, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllQuestion } from "../../redux/feature/User/questions/Question";
 
 export default function QuestionCard({ data }) {
-  const { _id, votes, answers, views, title, body, tags, user } = data
+  const { _id, votes, answers, views, title, tags, user } = data
+  const { token } = useSelector(state => state.user.user)
   const { cardBg, fontColor } = useColors()
-
+  const dispatch = useDispatch()
   return (
-    <Grid container spacing={2} sx={{ minWidth: "100%", bgcolor: cardBg, color: fontColor, padding: "10px", marginBottom: "20px", borderRadius: "10px" }}>
+    <Grid container spacing={2} sx={{ minWidth: "100%", bgcolor: cardBg, color: fontColor, padding: "10px", marginBottom: "30px", borderRadius: "4px" }}>
       <Grid item sm={12} md={2}>
         <Grid container sx={{ minWidth: "100%", minHeight: '100%' }}>
           <Grid item lg={12} >
@@ -29,7 +33,7 @@ export default function QuestionCard({ data }) {
         </Grid>
       </Grid>
       <Grid md={10} sm={12} item sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Link to={"/question/" + _id} style={{ textDecoration: "none", color:fontColor }}>
+        <Link to={"/question/" + _id} style={{ textDecoration: "none", color: fontColor }}>
           <Typography component="div" variant="h5">
             {title}
           </Typography>
@@ -39,11 +43,9 @@ export default function QuestionCard({ data }) {
             <Grid container>
               {tags?.map((data, index) => (
                 <Grid key={index} item sm={4} sx={{}}>
-                  <Link>
-                    <Typography sx={{ bgcolor: cardBg, color: fontColor, maxWidth: "100px", padding: "2px 10px ", display: 'flex', alignItems: "center", justifyContent: "center", marginRight: "10px", marginTop: "10px", borderRadius: "5px" }} variant="subtitle2" component="div">
-                      {data}
-                    </Typography>
-                  </Link>
+                  <Typography onClick={() => dispatch(getAllQuestion({ start: 0, search: data, token, limit: 10, role: 'user' }))} sx={{ cursor: 'pointer', bgcolor: cardBg, color: fontColor, maxWidth: "100px", padding: "2px 10px ", display: 'flex', alignItems: "center", justifyContent: "center", marginRight: "10px", marginTop: "10px", borderRadius: "5px" }} variant="subtitle2" component="div">
+                    {data}
+                  </Typography>
                 </Grid>
               ))}
             </Grid>
@@ -61,6 +63,6 @@ export default function QuestionCard({ data }) {
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </Grid >
   );
 }

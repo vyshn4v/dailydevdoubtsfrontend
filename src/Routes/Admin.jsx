@@ -7,20 +7,26 @@ import Questions from '../pages/Admin/QuestionsPage/Questions'
 import Users from '../pages/Admin/AllUsersPage/Users'
 import ViewQuestionPage from '../pages/Admin/ViewQuestion/ViewQuestion'
 import ViewReportedQuestion from '../pages/Admin/ViewReportedQuestionPage/ViewReportedQuestion'
-
+import Plans from '../pages/Admin/Plans/Plans'
+import AdverTiseMentPage from '../pages/Admin/AdvertisementPage/AdverTiseMentPage'
+import NotFound from '../pages/NotFound/NotFound'
+import { ErrorBoundary } from 'react-error-boundary'
+import FallBack from '../components/FallBack/FallBack'
 function Admin() {
     return (
         <Routes>
-            <Route path='/admin' element={<ProtectedRouter><DrawerOutlet /></ProtectedRouter>}>
-                <Route path='dashboard' element={<AdminDashBoard />} />
+            <Route path='/' element={<ProtectedRouter><DrawerOutlet /></ProtectedRouter>}>
+                <Route path='dashboard' element={<ErrorBoundary key={'user'} onReset={() => 'user'} fallback={<FallBack errorMessage={"Something went wrong while loading dashboard"} />}><AdminDashBoard /></ErrorBoundary>} />
                 <Route path='questions' element={<Questions />} />
                 <Route path='reports' element={<ViewReportedQuestion />} />
+                <Route path='advertises' element={<AdverTiseMentPage />} />
                 <Route path='users' element={<Users />} />
+                <Route path='plans' element={<Plans />} />
                 <Route path='question/:question_id' element={<ViewQuestionPage />} />
             </Route>
-            <Route path='/admin/login' element={<ProtectedRouter><AdminLogin /></ProtectedRouter>} />
+            <Route path='/login' element={<ProtectedRouter><AdminLogin /></ProtectedRouter>} />
             {/* <Route path='/admin' element={<ProtectedRouter><DrawerOutlet /></ProtectedRouter>} > */}
-
+            <Route path='/*' element={<NotFound />} />
         </Routes>
     )
 }

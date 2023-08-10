@@ -1,25 +1,42 @@
-import { Avatar, Button, CircularProgress, Container, Fab, Grid, LinearProgress, Stack, TextField, Typography } from '@mui/material'
+import { Avatar, Button, CircularProgress, Container, Fab, Grid, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { addProfileImage, getProfile } from '../../../redux/feature/User/profile/Profile'
+import { addProfileImage, clearUserData, getProfile } from '../../../redux/feature/User/profile/Profile'
 import UseColors from '../../../assets/Colors'
-import { Input } from '@mui/icons-material'
-import Loading from '../../../components/Loading/Loading'
 import { uploadProfile } from '../../../services/users'
 import { followUser, updateState } from '../../../redux/feature/User/userAuth/Auth'
+import { useErrorBoundary } from 'react-error-boundary'
 
 function Profile() {
+    const { showBoundary } = useErrorBoundary();
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const { cardBg, bgColor } = UseColors()
+    const { cardBg } = UseColors()
     const [loading, setLoading] = useState(false)
     const { state } = useLocation()
+    const { profile, isError } = useSelector((state) => state?.profile)
+    const { following_user } = useSelector(state => state.user.user)
     const { user } = useParams()
-    console.log(state);
     useEffect(() => {
-        dispatch(getProfile({ user: state,role:'user' }))
-    }, [state])
+    }, [])
+    useEffect(() => {
+        if (!profile) {
+            dispatch(getProfile({ user: state, role: 'user' }))
+        }
+        if (isError) {
+            showBoundary(new Error("Something went wrong"))
+        }
+        if (location.pathname.split('/')[1] !== encodeURIComponent(profile?.name) && location.pathname.split('/')[1] !== 'profile' && profile) {
+            showBoundary(new Error("Something went wrong"))
+        }
+
+    }, [dispatch, isError, profile, showBoundary, state])
+    useEffect(() => {
+        return () => {
+            dispatch(clearUserData())
+        }
+    }, [dispatch])
     const Buttons = [
         {
             name: "Details",
@@ -65,17 +82,14 @@ function Profile() {
         },
     ]
     const handleSubmitProfile = (e) => {
-        console.log(e.target.files);
         let form = new FormData()
         form.append('image', e.target.files[0])
         setLoading(true)
         uploadProfile(form).then((res) => {
-            console.log(res);
             dispatch(addProfileImage(res.data.data))
             dispatch(updateState())
             setLoading(false)
-        }).catch((err) => {
-            console.log(err);
+        }).catch(() => {
             setLoading(false)
         })
     }
@@ -85,114 +99,116 @@ function Profile() {
     const UnFollowUser = () => {
         dispatch(followUser({ user: state?._id }))
     }
-    const profile = useSelector((state) => state?.profile?.profile)
-    const { following_user } = useSelector(state => state.user.user)
+    console.log(location.pathname.split('/')[1], encodeURIComponent(profile?.name), profile);
     return (
         <>{
-            !profile ?
-                <Loading />
-                :
-                <Container sx={{ marginTop: '70px' }} >
-                    <Grid container display={'flex'} gap={'40px'} justifyContent={'center'} alignItems={'center'}>
-                        <Grid item xs={12} md={4} display={'flex'} direction={'column'} justifyContent={'center'} alignItems={'center'}  >
-                            <Stack sx={{ m: 1, position: 'relative' }}>
-                                <Avatar
-                                    src={profile?.profile_image}
-                                    sx={{ width: "200px", height: "200px" }}
-                                />
-                                {
-                                    loading &&
-                                    <CircularProgress size={200} thickness={1} sx={{ position: 'absolute' }} />
-                                }
-                            </Stack>
-                            {
-                                !state &&
-                                <Stack  >
-                                    <label htmlFor="upload-photo">
-                                        <input
-                                            style={{ display: 'none' }}
-                                            id="upload-photo"
-                                            name="image"
-                                            type="file"
-                                            onChange={handleSubmitProfile}
-                                        />
 
-                                        <Fab
-                                            sx={{
-                                                width: '200px',
-                                                marginTop: '30px'
-                                            }}
-                                            color='secondary'
-                                            size="small"
-                                            component="span"
-                                            aria-label="add"
-                                            variant="extended"
-                                        >
-                                            Upload photo
-                                        </Fab>
-                                    </label>
-                                </Stack>
+            <Container sx={{
+                paddingTop: '50px',
+                height: '90vh', overflow: 'scroll', "&::-webkit-scrollbar": {
+                    display: 'none'
+                }
+            }}>
+                <Grid container display={'flex'} gap={'40px'} justifyContent={'center'} alignItems={'center'} >
+                    <Grid item xs={12} md={4} display={'flex'} direction={'column'} justifyContent={'center'} alignItems={'center'}  >
+                        <Stack sx={{ m: 1, position: 'relative' }}>
+                            <Avatar
+                                src={profile?.profile_image}
+                                sx={{ width: "200px", height: "200px" }}
+                            />
+                            {
+                                loading &&
+                                <CircularProgress size={200} thickness={1} sx={{ position: 'absolute' }} />
                             }
-                        </Grid >
-                        <Grid item xs={12} md={7} display={'flex'} gap={'40px'} justifyContent={'space-around'} alignItems={'center'}>
-                            <Grid container>
-                                <Grid item xs={12} display={'flex'} gap={'20px'} justifyContent={'center'} alignItems={'center'}>
-                                    <Stack width={'30%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                        <Typography >
-                                            {profile?.following_user?.length} following
-                                        </Typography>
-                                    </Stack>
-                                    <Stack width={'30%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                        <Typography>
-                                            {profile?.followers?.length} followers
-                                        </Typography>
+                        </Stack>
+                        {
+                            !state &&
+                            <Stack  >
+                                <label htmlFor="upload-photo">
+                                    <input
+                                        style={{ display: 'none' }}
+                                        id="upload-photo"
+                                        name="image"
+                                        type="file"
+                                        onChange={handleSubmitProfile}
+                                    />
+
+                                    <Fab
+                                        sx={{
+                                            width: '200px',
+                                            marginTop: '30px'
+                                        }}
+                                        color='secondary'
+                                        size="small"
+                                        component="span"
+                                        aria-label="add"
+                                        variant="extended"
+                                    >
+                                        Upload photo
+                                    </Fab>
+                                </label>
+                            </Stack>
+                        }
+                    </Grid >
+                    <Grid item xs={12} md={7} display={'flex'} gap={'40px'} justifyContent={'space-around'} alignItems={'center'}>
+                        <Grid container>
+                            <Grid item xs={12} display={'flex'} gap={'20px'} justifyContent={'center'} alignItems={'center'}>
+                                <Stack width={'30%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                    <Typography >
+                                        {profile?.following_user?.length} following
+                                    </Typography>
+                                </Stack>
+                                <Stack width={'30%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                    <Typography>
+                                        {profile?.followers?.length} followers
+                                    </Typography>
+                                </Stack>
+                            </Grid>
+                            {
+                                state &&
+                                <Grid item xs={12} display={'flex'} gap={'20px'} justifyContent={'center'} alignItems={'center'} marginTop={'40px'}>
+                                    <Stack width={'50%'}>
+                                        {
+                                            following_user?.includes(profile?._id) ?
+                                                <Button onClick={UnFollowUser} disableRipple fullWidth variant='contained' color='error'>
+                                                    Un follow
+                                                </Button>
+                                                :
+                                                <Button onClick={handlefollowUser} disableRipple fullWidth variant='contained' color='primary'>
+                                                    Follow
+                                                </Button>
+                                        }
                                     </Stack>
                                 </Grid>
-                                {
-                                    state &&
-                                    <Grid item xs={12} display={'flex'} gap={'20px'} justifyContent={'center'} alignItems={'center'} marginTop={'40px'}>
-                                        <Stack width={'50%'}>
-                                            {
-                                                following_user?.includes(profile?._id) ?
-                                                    <Button onClick={UnFollowUser} disableRipple fullWidth variant='contained' color='error'>
-                                                        Un follow
-                                                    </Button>
-                                                    :
-                                                    <Button onClick={handlefollowUser} disableRipple fullWidth variant='contained' color='primary'>
-                                                        Follow
-                                                    </Button>
-                                            }
-                                        </Stack>
-                                    </Grid>
-                                }
-                            </Grid>
-                        </Grid>
-                        <Grid item xs={12} md={12} display={'flex'} gap={'40px'} justifyContent={'space-around'} alignItems={'center'}>
-                            <Grid container gap={'20px'} justifyContent={'center'}>
-                                {
-                                    Buttons.map((button, index) => (
-                                        button && < Grid key={index} item xs={3} md={2}>
-                                            <Typography onClick={button.onclick} sx={{
-                                                bgcolor: cardBg,
-                                                height: '50px',
-                                                borderRadius: "10px",
-                                                padding: "10px",
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                cursor: 'pointer'
-                                            }}>
-                                                {button.name}
-                                            </ Typography>
-                                        </Grid>
-                                    ))
-                                }
-                            </Grid>
-                        </Grid>
-                        <Grid item xs={12} md={12} display={'flex'} gap={'40px'} justifyContent={'space-around'} alignItems={'center'}>
-                            <Outlet />
+                            }
                         </Grid>
                     </Grid>
-                </Container >
+                    <Grid item xs={12} md={12} display={'flex'} gap={'40px'} justifyContent={'space-around'} alignItems={'center'}>
+                        <Grid container gap={'20px'} justifyContent={'center'}>
+                            {
+                                Buttons.map((button, index) => (
+                                    button && < Grid key={index} item xs={3} md={2}>
+                                        <Typography onClick={button.onclick} sx={{
+                                            bgcolor: cardBg,
+                                            height: '50px',
+                                            borderRadius: "10px",
+                                            padding: "10px",
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer'
+                                        }}>
+                                            {button.name}
+                                        </ Typography>
+                                    </Grid>
+                                ))
+                            }
+                        </Grid>
+                    </Grid>
+                    <Grid item xs={12} md={12} height={'100%'} display={'flex'} gap={'40px'} justifyContent={'space-around'} alignItems={'center'} >
+                        <Outlet />
+                    </Grid>
+                </Grid>
+            </Container >
         }
         </>
     )

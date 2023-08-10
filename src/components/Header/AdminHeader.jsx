@@ -11,7 +11,8 @@ function AdminHeader() {
     let drawerProps = [
         { name: "Dashboard", path: "/admin/dashboard" },
         { name: "Users", path: "/admin/users" },
-        { name: "Questions", path: "/admin/questions" },
+        { name: "Plans", path: "/admin/plans" },
+        { name: "Advertises", path: "/admin/advertises" },
         { name: "Reports", path: "/admin/reports" },
     ]
     const {  fontColor, headerColor } = useColors()

@@ -1,13 +1,15 @@
 import { useDispatch, useSelector } from "react-redux"
 import { addUser } from "../../../redux/feature/User/userAuth/Auth"
-import { Navigate } from "react-router-dom"
-import { useEffect } from "react"
+import { Navigate, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import PlanModal from "../../../components/PlanModal/PlanModal"
 
 // eslint-disable-next-line react/prop-types
 function ProtectedRouter({ children }) {
     const dispatch = useDispatch()
     const user = JSON.parse(localStorage.getItem('user'))
     const User = useSelector(state => state.user.user)
+ 
     if (user) {
         if (!User) {
             dispatch(addUser(user))
@@ -19,14 +21,17 @@ function ProtectedRouter({ children }) {
                 return <Navigate to={"/verify-otp"} />
             }
         } else {
+
             if (location.pathname === '/signup' || location.pathname === '/login' || location.pathname === '/verify-otp') {
                 return <Navigate to={'/'} />
-            } else {
+            }
+            else {
                 return children
             }
         }
+
     } else {
-        if (location.pathname === '/signup' || location.pathname === '/login') {
+        if (location.pathname === '/signup' || location.pathname === '/login'|| location.pathname === '/forgot-password') {
             return children
         } else {
             return <Navigate to={"/login"} />

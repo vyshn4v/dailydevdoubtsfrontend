@@ -1,13 +1,14 @@
-import { Button, Drawer, Grid, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
+/* eslint-disable react/prop-types */
+import { Button, Drawer, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import UseColors from "../../../assets/Colors";
 
-const ChatLayout = ({ DrawerComponet, chat, open, setOpen }) => {
+const ChatLayout = ({ DrawerComponent, chat, open, setOpen }) => {
     const theme = useTheme();
     const isMobileView = useMediaQuery(theme.breakpoints.down('md'));
     const { bgColor, cardBg, fontColor } = UseColors()
     return (
         <>
-            <Grid item xs={12} md={4}  >
+            <Grid item xs={12} md={4} display={'flex'} flexDirection={'column'} justifyContent={'center'}>
                 {isMobileView ? (
                     <Drawer
                         variant="temporary"
@@ -32,15 +33,15 @@ const ChatLayout = ({ DrawerComponet, chat, open, setOpen }) => {
                                 {
                                     isMobileView &&
                                     <Button onClick={setOpen}>
-                                        hello
+                                       Close
                                     </Button>
                                 }
                             </Grid>
                         </Grid>
-                        {DrawerComponet}
+                        {DrawerComponent}
                     </Drawer>
                 ) : (
-                    [DrawerComponet]
+                    [DrawerComponent]
                 )}
             </Grid>
             <Grid item xs={12} md={8} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} >
